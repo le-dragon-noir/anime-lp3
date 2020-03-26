@@ -1,40 +1,38 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, FlatList, View , Image} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, FlatList, View, Image } from 'react-native';
 import { Card, CardItem, Body, Content } from 'native-base';
-import { getTenNewestThreads } from '../api/AnilistService';
+import { getTenNewestThreads, getTopReviews } from '../api/AnilistService';
 import Constants from 'expo-constants';
 
-export default function HomeScreen({navigation}) {
-  const [threads, setThreads] = React.useState([])
+export default function ReviewScreen({ navigation }) {
+  const [reviews, setReviews] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
-
   React.useEffect(() => {
-    getTenNewestThreads(page).then(response => {
-      setThreads(threads.concat(response))
-      setIsRefreshing(false)
+    getTopReviews(page).then(response => {
+      setReviews(reviews.concat(response))
     })
   }, [page])
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList 
-        data={threads}
-        renderItem={({item}) => {
+      <FlatList
+        data={reviews}
+        renderItem={({ item }) => {
           return (
-            <ThreadCard 
+            <SummaryCard
+              summary={item.summary}
+              rating={item.rating}
+              mediaName={item.media.title.romaji}
               id={item.id}
-              title={item.title}
-              name={item.user.name}
-              date={(new Date(item.createdAt*1000)).toLocaleDateString()}
-              avatar={item.user.avatar.medium}
+              mediaImage={item.media.coverImage.medium}
             />
           )
         }}
-        keyExtractor={thread => {
-          return thread.id
+        keyExtractor={review => {
+          return review.id
         }}
-        onEndReached={() => {setPage(page + 2)}}
+        onEndReached={() => { setPage(page + 2) }}
         onEndReachedThreshold={0.1}
         onRefresh={() => {
           setIsRefreshing(true)
@@ -46,36 +44,34 @@ export default function HomeScreen({navigation}) {
     </SafeAreaView>
   );
 }
-const ThreadCard = ({title, name, date, id, avatar}) => (
+const SummaryCard = ({ summary, rating, mediaName, id, mediaImage }) => (
   <Card key={id}>
-    <CardItem onPress={(() => navigation.navigate('Media'))}>
+    <CardItem>
       <Body>
-        <Text>
-          {`${ title } \n`}
-        </Text>
-        <Image
-          style={styles.image}
-          source={{
-            uri: avatar
-          }}
-        />
         <View style={styles.row}>
-          <Text style={styles.userName}>
-            {`${ name }`}
+          <Text style={styles.summary}>
+            {`${ summary } \n`}
           </Text>
+          <Image
+            style={styles.image}
+            source={{
+              uri:
+                mediaImage
+            }}
+          />
+        </View>
+        <Text style={styles.userName}>
+          {`${ mediaName }`}
+        </Text>
+        <View style={styles.row}>
           <Text style={styles.threadDate}>
-            {`${ date }`}
+            {`Rating: ${ rating }`}
           </Text>
         </View>
       </Body>
     </CardItem>
   </Card>
 )
-
-
-HomeScreen.navigationOptions = {
-  header: null,
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -107,7 +103,11 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end'
   },
   image: {
-    width: 30,
-    height: 30
+    height: 100,
+    width: 70,
+    alignSelf: 'flex-end'
+  },
+  summary: {
+    width: 250
   }
 });

@@ -4,7 +4,7 @@ import { Card, CardItem, Body } from 'native-base';
 import { getStarterMedias } from '../api/AnilistService';
 import Constants from 'expo-constants';
 
-export default function LinksScreen({ navigation }) {
+export default function MediaViewScreen() {
   const [mediaArray, setMediaArray] = React.useState([])
   const [mediaPage, setMediaPage] = React.useState(0)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
@@ -18,28 +18,6 @@ export default function LinksScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={mediaArray}
-        renderItem={({ item }) => {
-          return (
-            <MediaCardRow
-              mediaRow={item}
-              navigation={navigation}
-            />
-          )
-        }}
-        keyExtractor={item => {
-          return item[0].id
-        }}
-        onEndReached={() => {setMediaPage(mediaPage + 2)}}
-        onEndReachedThreshold={0.1}
-        onRefresh={() => {
-          setIsRefreshing(true)
-          setMediaArray([])
-          setMediaPage(0)
-        }}
-        refreshing={isRefreshing}
-      />
     </SafeAreaView>
   );
 }
@@ -55,17 +33,8 @@ const MediaCardRow = ({ mediaRow }) => {
   )
 }
 
-const MediaCard = ({content, navigation}) => (
-  <Card
-    style={styles.imageCard}
-    key={content.id}
-    onTouchStart={
-      () => {
-        console.log('navigation', navigation)
-        {/* navigation.navigate('Media') */}
-      }
-    }
-  >
+const MediaCard = ({content}) => (
+  <Card style={styles.imageCard} key={content.id}>
     <CardItem>
       <Body>
         <Image
@@ -82,6 +51,7 @@ const MediaCard = ({content, navigation}) => (
     </CardItem>
   </Card>
 )
+
 
 const styles = StyleSheet.create({
   container: {

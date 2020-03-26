@@ -6,8 +6,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+
+
+import MediaViewScreen from './screens/MediaViewScreen';
+import HomeScreen from './screens/HomeScreen';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
+import LinksScreen from './screens/LinksScreen';
 
 const Stack = createStackNavigator();
 
@@ -51,7 +56,10 @@ export default function App(props) {
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
           <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
+            <Stack.Screen name="Bottom" component={BottomTabNavigator} />
+            <Stack.Screen name="Media" component={MediaViewScreen}/>
+            <Stack.Screen name="Links" component={LinksScreen}/>
+            <Stack.Screen name="Home" component={HomeScreen}/>
           </Stack.Navigator>
         </NavigationContainer>
       </View>
