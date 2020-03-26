@@ -79,3 +79,33 @@ export async function getTopReviews(page) {
   const response = await userActionForPost(apiSource, { query }) 
   return response.data.Page.reviews
 }
+
+export async function getTopCharacters(page) {
+  const query = `
+  query {
+    Page(page: ${page}, perPage: 4) {
+      characters(sort: FAVOURITES_DESC) {
+        id
+        name {
+          full
+        }
+        media {
+          nodes {
+            title {
+              romaji
+              english
+              native
+              userPreferred
+            }
+          }
+        }
+        image {
+          medium
+        }
+      }
+    }
+  }
+  `
+  const response = await userActionForPost(apiSource, { query }) 
+  return response.data.Page.characters
+}

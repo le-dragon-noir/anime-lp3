@@ -5,6 +5,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import ReviewScreen from '../screens/ReviewScreen';
 import AboutScreen from '../screens/AboutScreen';
+import CharactersScreen from '../screens/CharactersScreen';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'News';
@@ -38,11 +39,19 @@ export default function BottomTabNavigator({ navigation, route }) {
         }}
       />
       <BottomTab.Screen
+        name="Characters"
+        component={CharactersScreen}
+        options={{
+          title: 'Characters',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="male" />,
+        }}
+      />
+      <BottomTab.Screen
         name="About"
         component={AboutScreen}
         options={{
           title: 'About',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="male" />,
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="flag" />,
         }}
       />
     </BottomTab.Navigator>

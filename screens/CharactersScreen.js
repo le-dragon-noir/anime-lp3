@@ -1,42 +1,43 @@
 import * as React from 'react';
 import { SafeAreaView, StyleSheet, Text, FlatList, View, Image } from 'react-native';
 import { Card, CardItem, Body } from 'native-base';
-import { getStarterMedias } from '../api/AnilistService';
+import { getTopCharacters } from '../api/AnilistService';
 import Constants from 'expo-constants';
 
 export default function LinksScreen({ navigation }) {
-  const [mediaArray, setMediaArray] = React.useState([])
-  const [mediaPage, setMediaPage] = React.useState(0)
+  const [characters, setCharacters] = React.useState([])
+  const [page, setPage] = React.useState(0)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
 
   React.useEffect(() => {
-    getStarterMedias(mediaPage).then(response => {
-      setMediaArray(mediaArray.concat(response))
+    getTopCharacters(page).then(response => {
+      setCharacters(characters.concat(response))
       setIsRefreshing(false)
     })
-  }, [mediaPage])
+  }, [page])
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={mediaArray}
+        data={characters}
         renderItem={({ item }) => {
           return (
-            <MediaCardRow
-              mediaRow={item}
+            <CharacterCard
+              content={item}
               navigation={navigation}
             />
           )
         }}
         keyExtractor={item => {
-          return item[0].id
+          console.log('item', item)
+          return item.id
         }}
-        onEndReached={() => {setMediaPage(mediaPage + 2)}}
+        onEndReached={() => {setPage(page + 2)}}
         onEndReachedThreshold={0.1}
         onRefresh={() => {
           setIsRefreshing(true)
-          setMediaArray([])
-          setMediaPage(0)
+          setCharacters([])
+          setPage(0)
         }}
         refreshing={isRefreshing}
       />
@@ -44,43 +45,34 @@ export default function LinksScreen({ navigation }) {
   );
 }
 
-const MediaCardRow = ({ mediaRow }) => {
-  const firstMedia = mediaRow[0]
-  const secondMedia = mediaRow[1]
+const CharacterCard = ({ content }) => {
   return (
-    <View style={styles.row} key={`${firstMedia.id}${secondMedia.id}`}>
-      <MediaCard content={firstMedia}/>
-      <MediaCard content={secondMedia}/>
+    <View 
+      style={styles.row}
+      key={content.id}
+    >
+      <Card style={styles.imageCard}>
+        <CardItem>
+          <Body>
+            <Image
+              style={styles.image}
+              source={{
+                uri:
+                  content.image.medium
+              }}
+            />
+            <Text style={styles.title}>
+              {`${ content.name.full } \n`}
+            </Text>
+            <Text style={styles.media}>
+              {`${ content.media.nodes[0].title.romaji }`}
+            </Text>
+          </Body>
+        </CardItem>
+      </Card>
     </View>
   )
 }
-
-const MediaCard = ({content, navigation}) => (
-  <Card
-    style={styles.imageCard}
-    key={content.id}
-    onTouchEnd={
-      () => {
-        navigation.navigate('Media')
-      }
-    }
-  >
-    <CardItem>
-      <Body>
-        <Image
-          style={styles.image}
-          source={{
-            uri:
-            content.coverImage.large
-          }}
-        />
-        <Text style={styles.title}>
-          {`${ content.title.romaji }`}
-        </Text>
-      </Body>
-    </CardItem>
-  </Card>
-)
 
 const styles = StyleSheet.create({
   container: {
@@ -101,12 +93,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 13,
-    justifyContent: 'center',
+    alignSelf: 'center',
     fontWeight: 'bold'
+  },
+  media: {
+    fontSize: 13,
+    alignSelf: 'center',
+    color: 'gray'
   },
   imageCard: {
     height: 300,
-    flex: .45,
+    flex: .9,
     alignContent: 'center'
   },
   image: {

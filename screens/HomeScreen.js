@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SafeAreaView, StyleSheet, Text, FlatList, View , Image} from 'react-native';
-import { Card, CardItem, Body, Content } from 'native-base';
+import { Card, CardItem, Body, Spinner } from 'native-base';
 import { getTenNewestThreads } from '../api/AnilistService';
 import Constants from 'expo-constants';
 
@@ -8,47 +8,57 @@ export default function HomeScreen({navigation}) {
   const [threads, setThreads] = React.useState([])
   const [page, setPage] = React.useState(0)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(true)
 
 
   React.useEffect(() => {
     getTenNewestThreads(page).then(response => {
       setThreads(threads.concat(response))
       setIsRefreshing(false)
+      setIsLoading(false)
     })
   }, [page])
+
+  
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList 
-        data={threads}
-        renderItem={({item}) => {
-          return (
-            <ThreadCard 
-              id={item.id}
-              title={item.title}
-              name={item.user.name}
-              date={(new Date(item.createdAt*1000)).toLocaleDateString()}
-              avatar={item.user.avatar.medium}
-            />
-          )
-        }}
-        keyExtractor={thread => {
-          return thread.id
-        }}
-        onEndReached={() => {setPage(page + 2)}}
-        onEndReachedThreshold={0.1}
-        onRefresh={() => {
-          setIsRefreshing(true)
-          setThreads([])
-          setPage(0)
-        }}
-        refreshing={isRefreshing}
-      />
+      {isLoading
+        ? <Spinner style={styles.spinner} />
+        : (
+          <FlatList
+            data={threads}
+            renderItem={({ item }) => {
+              return (
+                <ThreadCard
+                  id={item.id}
+                  title={item.title}
+                  name={item.user.name}
+                  date={(new Date(item.createdAt * 1000)).toLocaleDateString()}
+                  avatar={item.user.avatar.medium}
+                />
+              )
+            }}
+            keyExtractor={thread => {
+              return thread.id
+            }}
+            onEndReached={() => { setPage(page + 2) }}
+            onEndReachedThreshold={0.1}
+            onRefresh={() => {
+              setIsRefreshing(true)
+              setThreads([])
+              setPage(0)
+            }}
+            refreshing={isRefreshing}
+          />
+        )}
     </SafeAreaView>
-  );
+  )
 }
 const ThreadCard = ({title, name, date, id, avatar}) => (
   <Card key={id}>
-    <CardItem onPress={(() => navigation.navigate('Media'))}>
+    <CardItem onPress={(() => {
+      {/* navigation.navigate('Media') */}
+      })}>
       <Body>
         <Text>
           {`${ title } \n`}
@@ -81,6 +91,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
+    justifyContent: 'center',
   },
   row: {
     flex: 1,
@@ -109,5 +120,10 @@ const styles = StyleSheet.create({
   image: {
     width: 30,
     height: 30
+  },
+  spinner: {
+    alignSelf: 'center',
+    width: 30,
+    height: 30,
   }
 });
