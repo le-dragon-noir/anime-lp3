@@ -59,11 +59,6 @@ const MediaCard = ({content, navigation}) => (
   <Card
     style={styles.imageCard}
     key={content.id}
-    onTouchEnd={
-      () => {
-        navigation.navigate('Media')
-      }
-    }
   >
     <CardItem>
       <Body>
